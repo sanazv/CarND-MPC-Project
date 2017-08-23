@@ -4,10 +4,10 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 ## Report
 The goal of this project was to implement model predictive control to drive the autonomous car successfully around the track. 
-I this report I address the points raised in the ruberic for the project. I have also included a video of the track here as well. Please feel free to download *MPC_drive.mov* and have a look. The car successfully completes the track without leaving the drivable parts or perform any unsafe behaviour. The velocity can be modified to upto 80 mph and the performance will not be compromised.
+I this report I address the points raised in the rubric for the project. I have also included a video of the track here as well. Please feel free to download *MPC_drive.mov* and have a look. The car successfully completes the track without leaving the drivable parts or perform any unsafe behaviour. The velocity can be modified to up to 80 mph and the performance will not be compromised.
 
 #### Model Description:
-In MPC we use information about state of the car (position, heading anf velocity) to predict what the control inputs (Steering angle and throttle/break) should be such that the car achives a path which is the closest to the waypoints of the road, i.e. not leaving the track and following the road curvature along the way. The equations of motion below describe the dynamics of the system. In this case we ignore the effects of friction (slip, damping etc), torque etc.
+In MPC we use information about state of the car (position, heading and velocity) to predict what the control inputs (Steering angle and throttle/brake) should be such that the car archives a path which is the closest to the waypoints of the road, i.e. not leaving the track and following the road curvature along the way. The equations of motion below describe the dynamics of the system. In this case we ignore the effects of friction (slip, damping etc), torque etc.
 ```
 x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
 y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
@@ -20,18 +20,18 @@ where:
 (x,y): position of the car 
 v: velocity
 psi: heading
-epsi: oriantation error
+epsi: orientation error
 cte: cross track error (distance offset to the side of the road)
 Lf: turn rate (physical characteristic of the vehicle)
-t, t+1: two consequtive timesteps
+t, t+1: two consecutive timesteps
 and control inputs (with some constraints):
-delta: steeting angle 
-a: accelatation (+ for throttle and - for break)
+delta: steering angle 
+a: acceleration (+ for throttle and - for break)
 
 #### Cost-function and parameter tuning: 
-A cost funtion is used with the aid of optimizer to minimize the deviation of the predicted track from the desired waypoints.
-The cost function I use, is sensitive to CTE (Cross Track Error), espi (orientation error), offset of velocity from the refernce value, streering angle, acceleration, and the change in steering angle and the change in acceleation between consequtaive timesteps. The two later terms are so that the car avoid very strong corrections one way or the other and appear to drive in a "calmer" way.
-The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceletation:
+A cost function is used with the aid of optimizer to minimize the deviation of the predicted track from the desired waypoints.
+The cost function I use, is sensitive to CTE (Cross Track Error), espi (orientation error), offset of velocity from the reference value, steering angle, acceleration, and the change in steering angle and the change in acceleration between consecutive timesteps. The two latter terms are so that the car avoid very strong corrections one way or the other and appear to drive in a "calmer" way.
+The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceleration:
 
  ```
  CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + tune_a a(i)^2 + tune_diff_d * [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
@@ -42,16 +42,17 @@ where `tune_a = 10` and `tune_diff_d = 600`.
 
 
 #### Choice of N and dt:
-N(number of timesteps) and dt(length of each timestep) are related to each other via: `T = N x dt`, where `T` is the time horizon for which the forward predictions are being made. I have tried a series of `T` values, and discovered that if `T` is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontol to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. In summary, in order to grasp a piece of the road ahead that can be approximated by a 3rd order polynomial (reach some curvature beyong straight road, but not too curvy), time horizon of 1s is chosen, which has to perform at a range of velocities. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed `T` to 1 sec.
-I also chose dt to be 0.1s for convinience, since the latency is also 0.1s, so I can lock the first element of the fitted vector which corresponds to the first 0.1s of the path.
+N(number of timesteps) and dt(length of each timestep) are related to each other via: `T = N x dt`, where `T` is the time horizon for which the forward predictions are being made. I have tried a series of `T` values, and discovered that if `T` is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontal to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. In summary, in order to grasp a piece of the road ahead that can be approximated by a 3rd order polynomial (reach some curvature beyond straight road, but not too curvy), time horizon of 1s is chosen, which has to perform at a range of velocities. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed `T` to 1 sec.
+I also chose dt to be 0.1s for convenience, since the latency is also 0.1s, so I can lock the first element of the fitted vector which corresponds to the first 0.1s of the path.
 I chose `N = 10`, which is the result of T/dt. That being said I have tried other values such as `N = 20 & dt = 0.1`, `N = 10, dt = 0.05` and many more. 
 
 #### Waypoints preprocessing: 
 
-The waypoints and the car state data are passed from the simulator to the code in global reference. In order to simplufy the polynomial fit and also easily update and repeat the prediciton afte each timeset, I convert all of these values to a coordinate system which is centered on the car and the x-axis is rotated to be along the direction of the car's heading. This way, `(x,y,psi)` of the car are all 0.
+The waypoints and the car state data are passed from the simulator to the code in global reference. In order to simplify the polynomial fit and also easily update and repeat the prediction after each timestamp, I convert all of these values to a coordinate system which is centered on the car and the x-axis is rotated to be along the direction of the car's heading. This way, `(x,y,psi)` of the car are all 0.
 
 #### Latency implementation:
-The drive is supposed to handle a 100ms (0.1s) latency from simulated to replicate the delays in actuator controls in real settings. For this puprpose, when the solver finds the parameters which minimize the cost fucntion, the full `N` values of them are kept. The latency index is calcualted by `latency_target/dt`, which in this case is `0.1/0.1 = `1. Then the values of acceletarion and streering angle at this index are cached and in the next iteration of optimization, the values at this index are kept constant and the optimizer optimizes for the rest. This replicates the fact that the actuator commands to a and delta, will be processed by the car with 0.1s delay.
+The drive is supposed to handle a 100ms (0.1s) latency from simulated to replicate the delays in actuator controls in real settings. For this purpose, when the solver finds the parameters which minimize the cost function, the full `N` values of them are kept. The latency index is calculated by `latency_target/dt`, which in this case is `0.1/0.1 = `1. Then the values of acceleration and steering angle at this index are cached and in the next iteration of optimization, the values at this index are kept constant and the optimizer optimizes for the rest. This replicates the fact that the actuator commands to a and delta, will be processed by the car with 0.1s delay.
+
 
 ## Dependencies
 
