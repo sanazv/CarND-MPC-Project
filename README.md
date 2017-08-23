@@ -17,6 +17,7 @@ cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
 epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
 ```
 where:
+```
 (x,y): position of the car 
 v: velocity
 psi: heading
@@ -27,7 +28,7 @@ t, t+1: two consecutive timesteps
 and control inputs (with some constraints):
 delta: steering angle 
 a: acceleration (+ for throttle and - for break)
-
+```
 #### Cost-function and parameter tuning: 
 A cost function is used with the aid of optimizer to minimize the deviation of the predicted track from the desired waypoints.
 The cost function I use, is sensitive to CTE (Cross Track Error), espi (orientation error), offset of velocity from the reference value, steering angle, acceleration, and the change in steering angle and the change in acceleration between consecutive timesteps. The two latter terms are so that the car avoid very strong corrections one way or the other and appear to drive in a "calmer" way.
