@@ -10,16 +10,16 @@ I this report I address the points raised in the ruberic for the project.
 #### Cost-function and parameter tuning: 
 ???
 #### Choice of N and dt:
-N(number of timesteps) and dt(length of each timestep) are related to each other via: T = N x dt, where T is the time horizon for which the forward predictions are being made. I have tried a series of T values, and discovered that if T is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontol to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed T to 1 sec.
+N(number of timesteps) and dt(length of each timestep) are related to each other via: `T = N x dt`, where T is the time horizon for which the forward predictions are being made. I have tried a series of T values, and discovered that if T is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontol to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed `T` to 1 sec.
 I also chose dt to be 0.1s for convinience, since the latency is also 0.1s, so I can lock the first element of the fitted vector which corresponds to the first 0.1s of the path.
-I chose N = 10, which is the result of T/dt. That being said I have tried other values such as $N$ = 20 & `dt` = 0.1, N = 10, dt = 0.05 and many more. 
+I chose N = 10, which is the result of T/dt. That being said I have tried other values such as `N = 20 & dt = 0.1`, `N = 10, dt = 0.05` and many more. 
 
 #### waypoints preprocessing: 
 
 The waypoints and the car state data are passed from the simulator to the code in global reference. In order to simplufy the polynomial fit and also easily update and repeat the prediciton afte each timeset, I convert all of these values to a coordinate system which is centered on the car and the x-axis is rotated to be along the direction of the car's heading. This way, (x,y,psi) of the car are all 0.
 
 #### Latency implementation:
-The drive is supposed to handle a 100ms (0.1s) latency from simulated to replicate the delays in actuator controls in real settings. For this puprpose, when the solver finds the parameters which minimize the cost fucntion, the full N values of them are kept. The latency index is calcualted by latency_target/dt, which in this case is 0.1/0.1 = 1. Then the values of acceletarion and streering angle at this index are cached and in the next iteration of optimization, the values at this index are kept constant and the optimizer optimizes for the rest. This replicates the fact that the actuator commands to a and delta, will be processed by the car with 0.1s delay.
+The drive is supposed to handle a 100ms (0.1s) latency from simulated to replicate the delays in actuator controls in real settings. For this puprpose, when the solver finds the parameters which minimize the cost fucntion, the full `N` values of them are kept. The latency index is calcualted by `latency_target/dt`, which in this case is `0.1/0.1 = `1. Then the values of acceletarion and streering angle at this index are cached and in the next iteration of optimization, the values at this index are kept constant and the optimizer optimizes for the rest. This replicates the fact that the actuator commands to a and delta, will be processed by the car with 0.1s delay.
 
 ## Dependencies
 
