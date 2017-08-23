@@ -6,15 +6,17 @@ Self-Driving Car Engineer Nanodegree Program
 I this report I address the points raised in the ruberic for the project. The car successfully completes the track without leaving the drivable parts or perform any unsafe behaviour. The velocity can be modified to upto 80mph and the performance will not be compromised. I have included a video of the track here as well. Please feel free to download *MPC_drive.mov* and have a look.
 
 #### Model Description:
-      // x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
-      // y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
-      // psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
-      // v_[t+1] = v[t] + a[t] * dt
-      // cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
-      // epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+
+```
+       x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+       y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+       psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+       v_[t+1] = v[t] + a[t] * dt
+       cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+       epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+```
 
 
-put formulat
 #### Cost-function and parameter tuning: 
  The cost function I use, is sensitive to CTE (Cross Track Error), espi (?????), offset of velocity from the refernce value, streering, acceleration, and the change in steering angle and acceleation between consequtaive timesteps. The later is so that the car avoid very strong corrections one way or the other and appear to drive in a "calmer" way.
 The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceletation:
