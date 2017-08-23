@@ -91,26 +91,70 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-
+          //double acceleration = j[1]["throttle"];
+          //double steering_angle = j[1]["steering_angle"];
+            
           /*
           * TODO: Calculate steering angle and throttle using MPC.
           *
           * Both are in between [-1, 1].
           *
           */
+            
           double steer_value;
           double throttle_value;
-
+        // waypoints in local coords
+          vector<double> wp_local_ptsx;
+          vector<double> wp_local_ptsy;
+            
+          // compute waypoints in local coords
+          for (int i = 0; i < ptsx.size(); i++) {
+              double x_local = (ptsx[i] - px)*cos(-psi) - (ptsy[i] - py)*sin(-psi);
+              double y_local = (ptsx[i] - px)*sin(-psi) + (ptsy[i] - py)*cos(-psi);
+              
+              wp_local_ptsx.push_back(x_local);
+              wp_local_ptsy.push_back(y_local);
+          }
+            
+            // convert type for use with polyfit
+            double* wp_local_ptsx_ptr = &wp_local_ptsx[0];
+            double* wp_local_ptsy_ptr = &wp_local_ptsy[0];
+            Eigen::Map<Eigen::VectorXd> ptsx_vect(wp_local_ptsx_ptr, wp_local_ptsx.size());
+            Eigen::Map<Eigen::VectorXd> ptsy_vect(wp_local_ptsy_ptr, wp_local_ptsy.size());
+            
+            // polynomial coefficents of forward path
+            auto wp_coeffs = polyfit(ptsx_vect, ptsy_vect, 3);
+            
+            // The cross track error is calculated by evaluating at polynomial at x, f(x)
+            // and subtracting y.
+            double cte = wp_coeffs[0];
+            double epsi = -atan(wp_coeffs[1] ) ;
+            
+            Eigen::VectorXd state(6);
+            
+            state << 0.0, 0.0, 0.0, v, cte, epsi;
+            
+            auto vars = mpc.Solve(state, wp_coeffs);
+            int latency_ind = mpc.getLatencyIndex();
+            
+            steer_value = vars.delta[latency_ind];
+            throttle_value = vars.a[latency_ind];
+            
+            // save the results for the next time step
+            mpc.prev_delta = steer_value;
+            mpc.prev_a = throttle_value;
+            
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
+          msgJson["steering_angle"] = -steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
 
           //Display the MPC predicted trajectory 
-          vector<double> mpc_x_vals;
-          vector<double> mpc_y_vals;
+          vector<double> mpc_x_vals = vars.x;
+          vector<double> mpc_y_vals = vars.y;
 
+            
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
@@ -120,7 +164,12 @@ int main() {
           //Display the waypoints/reference line
           vector<double> next_x_vals;
           vector<double> next_y_vals;
-
+            
+            for (int i=0; i<50; i+=3)
+            {
+                next_x_vals.push_back(i);
+                next_y_vals.push_back(polyeval(wp_coeffs,i));
+            }
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
