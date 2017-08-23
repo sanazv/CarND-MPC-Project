@@ -8,12 +8,12 @@ I this report I address the points raised in the ruberic for the project. The ca
 #### Model Description:
 
 ```
-       x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
-       y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
-       psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
-       v_[t+1] = v[t] + a[t] * dt
-       cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
-       epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+v_[t+1] = v[t] + a[t] * dt
+cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
 ```
 
 
@@ -22,10 +22,10 @@ I this report I address the points raised in the ruberic for the project. The ca
 The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceletation:
 
  ```
- CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + 10 a(i)^2 + 600 [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
+ CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + tune_a a(i)^2 + tune_diff_d * [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
  ```
 
-
+where `tune_a = 10` and `tune_diff_d = 600`.
 
 
 
