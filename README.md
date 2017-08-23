@@ -3,14 +3,14 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 ## Report
-I this report I address the points raised in the ruberic for the project.
+I this report I address the points raised in the ruberic for the project. The car successfully completes the track without leaving the drivable parts or perform any unsafe behaviour. The velocity can be modified to upto 80mph and the performance will not be compromised. 
 
 #### Model Description:
 ???
 #### Cost-function and parameter tuning: 
 ???
 #### Choice of N and dt:
-N(number of timesteps) and dt(length of each timestep) are related to each other via: `T = N x dt`, where T is the time horizon for which the forward predictions are being made. I have tried a series of `T` values, and discovered that if T is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontol to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed `T` to 1 sec.
+N(number of timesteps) and dt(length of each timestep) are related to each other via: `T = N x dt`, where `T` is the time horizon for which the forward predictions are being made. I have tried a series of `T` values, and discovered that if T is too large, then the 3rd order polynomial fit has to fit a stretch of the road which will not only bend but even appear almost horizontol to the car point of view. This will cause the waypoints to form shapes that are no longer 3rd order polynomials, so the fit would be less accurate. In summary, in order to grasp a piece of the road ahead that can be approximated by a 3rd order polynomial (reach some curvature beyong straight road, but not too curvy), time horizon of 1s is chosen, which has to perform at a range of velocities. I found that time horizon in 1s-1.25s range is a good choice. With that I fixed `T` to 1 sec.
 I also chose dt to be 0.1s for convinience, since the latency is also 0.1s, so I can lock the first element of the fitted vector which corresponds to the first 0.1s of the path.
 I chose `N = 10`, which is the result of T/dt. That being said I have tried other values such as `N = 20 & dt = 0.1`, `N = 10, dt = 0.05` and many more. 
 
