@@ -35,7 +35,7 @@ The cost function I used, is sensitive to CTE (Cross Track Error), espi (orienta
 The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceleration:
 
  ```
- CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + tune_a a(i)^2 + tune_diff_d * [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
+ CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + tune_a * a(i)^2 + tune_diff_d * [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
  ```
 
 where `tune_a = 10` and `tune_diff_d = 600`.
