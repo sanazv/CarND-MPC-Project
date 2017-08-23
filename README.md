@@ -2,6 +2,17 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Report
+
+#### Model Description:
+
+#### Choice of N and dt:
+
+#### waypoints preprocessing: 
+
+
+#### Latency implementation:
+
 
 ## Dependencies
 
