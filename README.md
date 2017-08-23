@@ -22,13 +22,8 @@ I this report I address the points raised in the ruberic for the project. The ca
 The weight of these terms are chosen to represent the relative importance of each component. The final cost function is set up as below, with cost function to be most penalizing to sharp changes to streeting in angle and acceletation:
 
  ```
-   Cost-Function  = sum_i CTE(i)^2 
-              + epsi(i)^2 
-              + (v(i)-v_ref)^2 + delta(i)^2 
-              + 10 a(i)^2 
-              + 600 [delta(i+1)-delta(i)] 
-              + [a(i+1)-a(i)]
-   ```
+ CF  = sum_i CTE(i)^2 + epsi(i)^2 + (v(i)-v_ref)^2 + delta(i)^2 + 10 a(i)^2 + 600 [delta(i+1)-delta(i)] + [a(i+1)-a(i)]
+ ```
 
 
 
