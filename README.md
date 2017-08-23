@@ -7,6 +7,10 @@ I this report I address the points raised in the ruberic for the project. The ca
 
 #### Model Description:
 ???
+\begin{align}
+    \delta & \in [-25^{\circ}, 25^{\circ} ] \nonumber \\
+    a & \in [-1,1] \nonumber
+    \end{align}
 
 
 put formulat
@@ -25,7 +29,7 @@ N(number of timesteps) and dt(length of each timestep) are related to each other
 I also chose dt to be 0.1s for convinience, since the latency is also 0.1s, so I can lock the first element of the fitted vector which corresponds to the first 0.1s of the path.
 I chose `N = 10`, which is the result of T/dt. That being said I have tried other values such as `N = 20 & dt = 0.1`, `N = 10, dt = 0.05` and many more. 
 
-#### waypoints preprocessing: 
+#### Waypoints preprocessing: 
 
 The waypoints and the car state data are passed from the simulator to the code in global reference. In order to simplufy the polynomial fit and also easily update and repeat the prediciton afte each timeset, I convert all of these values to a coordinate system which is centered on the car and the x-axis is rotated to be along the direction of the car's heading. This way, `(x,y,psi)` of the car are all 0.
 
